@@ -1,0 +1,325 @@
+@import "@fontsource/plus-jakarta-sans/400.css";
+@import "@fontsource/plus-jakarta-sans/500.css";
+@import "@fontsource/plus-jakarta-sans/600.css";
+@import "@fontsource/plus-jakarta-sans/700.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Performance: Reduce layout thrashing with CSS containment */
+section {
+  contain: layout style;
+}
+
+.card, [data-radix-scroll-area-viewport] {
+  contain: layout style;
+}
+
+/* Design System - Escolinha de Futebol SaaS */
+
+@layer base {
+  :root {
+    /* ATLETA ID - Navy Blue & Bright Blue theme */
+    --background: 210 20% 98%;
+    --foreground: 215 40% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 40% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 40% 15%;
+
+    /* Primary - Deep navy blue */
+    --primary: 215 50% 20%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light blue-gray */
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 215 40% 20%;
+
+    /* Muted */
+    --muted: 210 15% 92%;
+    --muted-foreground: 215 10% 45%;
+
+    /* Accent - Bright blue (ATLETA ID accent) */
+    --accent: 200 100% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Success */
+    --success: 142 70% 45%;
+    --success-foreground: 0 0% 100%;
+
+    /* Warning - Birthday yellow */
+    --warning: 45 95% 55%;
+    --warning-foreground: 30 50% 15%;
+
+    /* Destructive */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 88%;
+    --input: 210 20% 88%;
+    --ring: 200 100% 50%;
+
+    --radius: 0.75rem;
+
+    /* Custom gradients */
+    --gradient-field: linear-gradient(135deg, hsl(215 50% 20%) 0%, hsl(200 100% 50%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 20% 98%) 100%);
+    --gradient-birthday: linear-gradient(135deg, hsl(45 95% 55%) 0%, hsl(35 90% 60%) 100%);
+
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(215 40% 15% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(215 40% 15% / 0.08), 0 2px 4px -2px hsl(215 40% 15% / 0.05);
+    --shadow-lg: 0 10px 15px -3px hsl(215 40% 15% / 0.1), 0 4px 6px -4px hsl(215 40% 15% / 0.05);
+    --shadow-glow: 0 0 20px hsl(200 100% 50% / 0.2);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 215 40% 26%;
+    --sidebar-primary: 215 50% 20%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 210 30% 94%;
+    --sidebar-accent-foreground: 215 40% 20%;
+    --sidebar-border: 210 20% 88%;
+    --sidebar-ring: 200 100% 50%;
+  }
+
+  .dark {
+    --background: 215 30% 8%;
+    --foreground: 210 20% 95%;
+
+    --card: 215 25% 12%;
+    --card-foreground: 210 20% 95%;
+
+    --popover: 215 25% 12%;
+    --popover-foreground: 210 20% 95%;
+
+    --primary: 200 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 215 20% 18%;
+    --secondary-foreground: 210 20% 90%;
+
+    --muted: 215 15% 18%;
+    --muted-foreground: 210 10% 60%;
+
+    --accent: 200 90% 55%;
+    --accent-foreground: 0 0% 100%;
+
+    --success: 142 65% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 90% 50%;
+    --warning-foreground: 30 50% 15%;
+
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 215 15% 20%;
+    --input: 215 15% 20%;
+    --ring: 200 100% 50%;
+
+    --sidebar-background: 215 25% 10%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 200 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 215 20% 18%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 215 15% 20%;
+    --sidebar-ring: 200 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+}
+
+/* Safe area insets for mobile */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+}
+
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+}
+
+/* Per-profile theme: Dark Orange (black bg, orange/white text, blue accents) */
+[data-theme="dark-orange"] {
+  --background: 220 15% 6%;
+  --foreground: 0 0% 95%;
+  --card: 220 12% 10%;
+  --card-foreground: 0 0% 95%;
+  --popover: 220 12% 10%;
+  --popover-foreground: 0 0% 95%;
+  --primary: 25 95% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 10% 15%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 220 10% 14%;
+  --muted-foreground: 220 5% 55%;
+  --accent: 200 100% 50%;
+  --accent-foreground: 0 0% 100%;
+  --border: 220 10% 18%;
+  --input: 220 10% 18%;
+  --ring: 25 95% 55%;
+  --destructive: 0 70% 45%;
+  --destructive-foreground: 0 0% 100%;
+}
+
+/* Dark-orange: override all hardcoded utility classes */
+[data-theme="dark-orange"] .bg-carreira {
+  background-color: hsl(220 15% 6%);
+}
+
+[data-theme="dark-orange"] .bg-white,
+[data-theme="dark-orange"] .from-white {
+  --tw-gradient-from: hsl(220 12% 10%);
+  background-color: hsl(220 12% 10%);
+}
+
+[data-theme="dark-orange"] .to-orange-50\/40 {
+  --tw-gradient-to: hsl(25 40% 10% / 0.4);
+}
+
+[data-theme="dark-orange"] .to-blue-50\/40 {
+  --tw-gradient-to: hsl(200 40% 10% / 0.4);
+}
+
+[data-theme="dark-orange"] .from-orange-50,
+[data-theme="dark-orange"] .bg-orange-50 {
+  --tw-gradient-from: hsl(25 30% 12%);
+  background-color: hsl(25 30% 12%);
+}
+
+[data-theme="dark-orange"] .to-amber-50 {
+  --tw-gradient-to: hsl(30 30% 12%);
+}
+
+[data-theme="dark-orange"] .border-orange-200 {
+  border-color: hsl(25 60% 25%);
+}
+
+[data-theme="dark-orange"] .bg-muted\/30 {
+  background-color: hsl(220 15% 6% / 0.3);
+}
+
+[data-theme="dark-orange"] .bg-muted\/50,
+[data-theme="dark-orange"] .hover\:bg-muted\/50:hover {
+  background-color: hsl(220 10% 14% / 0.5);
+}
+
+[data-theme="dark-orange"] .bg-blue-500\/10 {
+  background-color: hsl(200 100% 50% / 0.1);
+}
+
+[data-theme="dark-orange"] .text-blue-700 {
+  color: hsl(200 90% 65%);
+}
+
+[data-theme="dark-orange"] .border-blue-200 {
+  border-color: hsl(200 60% 30%);
+}
+
+[data-theme="dark-orange"] .bg-green-500\/10 {
+  background-color: hsl(142 50% 40% / 0.1);
+}
+
+[data-theme="dark-orange"] .text-green-700 {
+  color: hsl(142 60% 55%);
+}
+
+[data-theme="dark-orange"] .border-green-200 {
+  border-color: hsl(142 40% 25%);
+}
+
+/* Dark-orange premium card effects */
+[data-theme="dark-orange"] .rounded-xl {
+  box-shadow: 0 2px 12px hsl(0 0% 0% / 0.3);
+}
+
+[data-theme="dark-orange"] .shadow-md,
+[data-theme="dark-orange"] .shadow-lg {
+  box-shadow: 0 4px 20px hsl(0 0% 0% / 0.4);
+}
+
+[data-theme="dark-orange"] .bg-gradient-to-r.from-green-500 {
+  background: linear-gradient(to right, hsl(142 65% 40%), hsl(160 60% 35%));
+}
+
+@layer utilities {
+  .bg-carreira {
+    background-color: hsl(30 80% 97%);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-md);
+  }
+  
+  .shadow-card-hover {
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .gradient-field {
+    background: var(--gradient-field);
+  }
+  
+  .gradient-birthday {
+    background: var(--gradient-birthday);
+  }
+
+  .animate-bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+
+  @keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .animate-slide-in {
+    animation: slide-in-right 0.4s ease-out forwards;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

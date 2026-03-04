@@ -1,0 +1,41 @@
+{
+  "headers": [
+    {
+      "source": "/carreira-sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/carreira-manifest.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    }
+  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "redirects": [
+    {
+      "source": "/carreira/:path*",
+      "has": [
+        { "type": "host", "value": "atletaid.com.br" }
+      ],
+      "destination": "https://carreiraid.com.br/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/carreira",
+      "has": [
+        { "type": "host", "value": "atletaid.com.br" }
+      ],
+      "destination": "https://carreiraid.com.br/",
+      "permanent": true
+    }
+  ]
+}

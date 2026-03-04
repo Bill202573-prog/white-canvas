@@ -1,0 +1,1 @@
+ALTER TABLE public.perfil_atleta ADD COLUMN IF NOT EXISTS cor_destaque text DEFAULT '#3b82f6';

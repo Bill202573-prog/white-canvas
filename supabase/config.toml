@@ -1,0 +1,97 @@
+project_id = "obvfyxiuvcpiogdyclke"
+
+[functions.seed-test-data]
+verify_jwt = false
+
+[functions.reset-responsavel-password]
+verify_jwt = false
+
+[functions.generate-billing]
+verify_jwt = false
+
+[functions.abacatepay-webhook]
+verify_jwt = false
+
+[functions.generate-student-billing]
+verify_jwt = false
+
+[functions.generate-mensalidade-pix]
+verify_jwt = false
+
+[functions.check-mensalidade-payment]
+verify_jwt = false
+
+[functions.asaas-create-subaccount]
+verify_jwt = false
+
+[functions.asaas-send-documents]
+verify_jwt = false
+
+[functions.asaas-webhook]
+verify_jwt = false
+
+[functions.asaas-submit-registration]
+verify_jwt = false
+
+[functions.asaas-check-account-status]
+verify_jwt = false
+
+[functions.asaas-webhook-handler]
+verify_jwt = false
+
+[functions.asaas-configure-webhook]
+verify_jwt = false
+
+[functions.cancel-amistoso-payment]
+verify_jwt = false
+
+[functions.check-amistoso-payment]
+verify_jwt = false
+
+[functions.register-student-initial]
+verify_jwt = false
+
+[functions.send-guardian-credentials]
+verify_jwt = false
+
+[functions.generate-enrollment-pix]
+verify_jwt = false
+
+[functions.check-enrollment-payment]
+verify_jwt = false
+
+[functions.send-teacher-welcome-email]
+verify_jwt = false
+
+[functions.reset-teacher-password]
+verify_jwt = false
+
+[functions.update-user-email]
+verify_jwt = false
+
+[functions.whatsapp-bot]
+verify_jwt = false
+
+[functions.cancel-enrollment-payment]
+verify_jwt = false
+
+[functions.asaas-disable-notifications]
+verify_jwt = false
+
+[functions.send-push-notification]
+verify_jwt = false
+
+[functions.process-push-reminders]
+verify_jwt = false
+
+[functions.n8n-query]
+verify_jwt = false
+
+[functions.generate-carreira-pix]
+verify_jwt = false
+
+[functions.check-carreira-payment]
+verify_jwt = false
+
+[functions.create-carreira-checkout]
+verify_jwt = false

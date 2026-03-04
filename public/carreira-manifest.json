@@ -1,0 +1,29 @@
+{
+  "name": "CARREIRA ID",
+  "short_name": "CARREIRA ID",
+  "description": "Sua vitrine esportiva pública — conecte-se com atletas, escolas e profissionais do esporte",
+  "theme_color": "#1e3a5f",
+  "background_color": "#0f172a",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "id": "/carreira",
+  "categories": ["sports", "social"],
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/carreira-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/carreira-icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+    <title>ATLETA ID - Gestão Inteligente para Escolinhas de Futebol</title>
+    <meta name="description" content="Sistema completo de gestão para escolinhas de futebol. Controle alunos, turmas, presença, mensalidades, campeonatos e a jornada esportiva de cada atleta." />
+    <meta name="author" content="ATLETA ID" />
+    <meta name="keywords" content="gestão escolinha futebol, sistema escolinha esportiva, controle presença alunos, mensalidade escolinha, campeonato futebol base, atleta id, carreira id" />
+    <link rel="icon" href="/pwa-icon-192.png" type="image/png" />
+    <link rel="canonical" href="https://atletaid.com.br/" />
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3a5f" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
+    
+    <!-- iOS PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ATLETA ID" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/apple-touch-icon.png" />
+    
+    <!-- iOS Splash Screens -->
+    <link rel="apple-touch-startup-image" href="/pwa-icon-512.png" />
+    
+    <!-- Android/Chrome PWA Support -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="ATLETA ID" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-TileColor" content="#1e3a5f" />
+    <meta name="msapplication-TileImage" content="/pwa-icon-192.png" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="ATLETA ID - Gestão Inteligente para Escolinhas de Futebol" />
+    <meta property="og:description" content="Controle alunos, turmas, presença, mensalidades e campeonatos. Construa o histórico esportivo de cada atleta da base." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://atletaid.com.br/" />
+    <meta property="og:image" content="https://atletaid.com.br/pwa-icon-512.png" />
+    <meta property="og:image:width" content="512" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:site_name" content="ATLETA ID" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@atletaid" />
+    <meta name="twitter:title" content="ATLETA ID - Gestão Inteligente para Escolinhas" />
+    <meta name="twitter:description" content="Sistema completo de gestão para escolinhas de futebol. Controle alunos, turmas, presença e campeonatos." />
+    <meta name="twitter:image" content="https://atletaid.com.br/pwa-icon-512.png" />
+    
+    <!-- Preconnect to improve performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
+    
+    <!-- DNS Prefetch for faster resolution -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+    <link rel="dns-prefetch" href="https://cdn.gpteng.co" />
+
+    <!-- Preload critical assets for LCP -->
+    <link rel="modulepreload" href="/src/main.tsx" />
+
+    <!-- Conditional PWA setup: Carreira vs AtletaID -->
+    <script>
+      (function() {
+        var CARREIRA_DOMAINS = ['carreiraid.com.br', 'www.carreiraid.com.br'];
+        var isCarreiraDomain = CARREIRA_DOMAINS.indexOf(window.location.hostname) !== -1;
+        var isCarreiraRoute = window.location.pathname.startsWith('/carreira');
+        
+        if (isCarreiraDomain || isCarreiraRoute) {
+          // === CARREIRA DOMAIN / ROUTE ===
+          // Remove any existing manifest links (from vite-plugin-pwa)
+          var existingManifests = document.querySelectorAll('link[rel="manifest"]');
+          existingManifests.forEach(function(el) { el.parentNode.removeChild(el); });
+
+          // Observe future manifest injections by vite-plugin-pwa and remove them
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+              m.addedNodes.forEach(function(node) {
+                if (node.tagName === 'LINK' && node.rel === 'manifest' && node.href.indexOf('carreira') === -1) {
+                  node.parentNode.removeChild(node);
+                }
+              });
+            });
+          });
+          observer.observe(document.head, { childList: true });
+
+          // Inject Carreira manifest
+          var link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = '/carreira-manifest.json';
+          document.head.appendChild(link);
+          
+          // Update apple meta tags for Carreira
+          var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+          if (appleTitle) appleTitle.content = 'CARREIRA ID';
+          var appName = document.querySelector('meta[name="application-name"]');
+          if (appName) appName.content = 'CARREIRA ID';
+
+          // Update page title and OG tags for Carreira domain
+          if (isCarreiraDomain) {
+            document.title = 'CARREIRA ID - Identidade Esportiva Digital para Atletas de Base';
+            
+            // Update meta description
+            var metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.content = 'Organize e valorize a trajetória esportiva do atleta desde a base. Perfil público, histórico de clubes, campeonatos e conquistas documentadas.';
+
+            // Update canonical
+            var canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical) canonical.href = 'https://carreiraid.com.br/';
+
+            // Update OG meta tags
+            var ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle) ogTitle.content = 'CARREIRA ID - Identidade Esportiva Digital';
+            var ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc) ogDesc.content = 'Organize e valorize a trajetória esportiva do atleta desde a base. Histórico de clubes, campeonatos e conquistas documentadas.';
+            var ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl) ogUrl.content = 'https://carreiraid.com.br/';
+            var ogImage = document.querySelector('meta[property="og:image"]');
+            if (ogImage) ogImage.content = 'https://carreiraid.com.br/carreira-og-image.png';
+            var twitterImage = document.querySelector('meta[name="twitter:image"]');
+            if (twitterImage) twitterImage.content = 'https://carreiraid.com.br/carreira-og-image.png';
+            var twitterTitle = document.querySelector('meta[name="twitter:title"]');
+            if (twitterTitle) twitterTitle.content = 'CARREIRA ID - Identidade Esportiva Digital';
+            var twitterDesc = document.querySelector('meta[name="twitter:description"]');
+            if (twitterDesc) twitterDesc.content = 'Organize e valorize a trajetória esportiva do atleta desde a base.';
+            
+            // Update favicon
+            var favicon = document.querySelector('link[rel="icon"]');
+            if (favicon) favicon.href = '/carreira-icon-512.png';
+          }
+
+          // Register ONLY carreira-sw.js and unregister any Workbox SW
+          if ('serviceWorker' in navigator) {
+            var swScope = isCarreiraDomain ? '/' : '/carreira';
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+              registrations.forEach(function(reg) {
+                // Unregister Workbox SWs (sw.js) on carreira domain to prevent conflicts
+                if (reg.active && reg.active.scriptURL && !reg.active.scriptURL.includes('carreira-sw.js') && !reg.active.scriptURL.includes('push-sw.js')) {
+                  reg.unregister();
+                }
+              });
+            });
+            navigator.serviceWorker.register('/carreira-sw.js', { scope: swScope });
+          }
+        } else {
+          // === ATLETAID DOMAIN ===
+          // Register Workbox SW manually (injectRegister is disabled in vite config)
+          if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+              navigator.serviceWorker.register('/sw.js', { scope: '/' });
+            });
+          }
+        }
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

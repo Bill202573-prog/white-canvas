@@ -1,0 +1,1 @@
+ALTER TABLE public.turmas ADD COLUMN categoria_sub integer;

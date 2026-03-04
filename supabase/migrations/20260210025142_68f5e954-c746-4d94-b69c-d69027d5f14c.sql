@@ -1,0 +1,1 @@
+ALTER TABLE public.perfil_atleta ADD COLUMN IF NOT EXISTS instagram_url text;

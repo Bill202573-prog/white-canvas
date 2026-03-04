@@ -1,0 +1,1 @@
+INSERT INTO saas_config (chave, valor) VALUES ('carreira_valor_mensal', '19.90') ON CONFLICT (chave) DO NOTHING;
