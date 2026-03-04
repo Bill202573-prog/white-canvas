@@ -6,8 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PWAUpdatePrompt } from "@/components/shared/PWAUpdatePrompt";
-import LandingPage from "./pages/LandingPage";
-import { isCarreiraDomain } from "@/hooks/useCarreiraBasePath";
+// LandingPage do Atleta ID mantida para uso futuro se necessário
+// import LandingPage from "./pages/LandingPage";
 
 // Lazy load pages not needed on initial render
 const Auth = lazy(() => import("./pages/Auth"));
@@ -43,8 +43,6 @@ const queryClient = new QueryClient({
   },
 });
 
-const carreira = isCarreiraDomain();
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -55,38 +53,28 @@ const App = () => (
         <BrowserRouter>
           <Suspense fallback={null}>
             <Routes>
-              {carreira ? (
-                <>
-                  {/* carreiraid.com.br — Carreira routes at root */}
-                  <Route path="/" element={<CarreiraLandingV2Page />} />
-                  <Route path="/cadastro" element={<CarreiraCadastroPage />} />
-                  <Route path="/minha" element={<CarreiraLinkedinPage />} />
-                  <Route path="/explorar" element={<CarreiraExplorarPage />} />
-                  <Route path="/conexoes" element={<CarreiraConexoesPage />} />
-                  <Route path="/termos" element={<TermosPage />} />
-                  <Route path="/privacidade" element={<PrivacidadePage />} />
-                  <Route path="/contato" element={<ContatoPage />} />
-                  <Route path="/perfil/:userId" element={<PerfilPage />} />
-                  <Route path="/escola/:slug" element={<EscolaPerfilPage />} />
-                  <Route path="/:slug" element={<CarreiraPerfilPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </>
-              ) : (
-                <>
-                  {/* atletaid.com.br — Full app with Carreira under /carreira */}
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/login" element={<Auth />} />
-                  <Route path="/install" element={<InstallApp />} />
-                  <Route path="/indicacao" element={<IndicacaoPage />} />
-                  <Route path="/i" element={<ShortIndicacaoRedirect />} />
-                  {/* Carreira routes temporarily disabled */}
-                  {/* Retrocompatibilidade com links antigos - temporarily disabled */}
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/dashboard/*" element={<Dashboard />} />
-                  <Route path="*" element={<NotFound />} />
-                </>
-              )}
+              {/* Carreira ID — rota principal */}
+              <Route path="/" element={<CarreiraLandingV2Page />} />
+              <Route path="/cadastro" element={<CarreiraCadastroPage />} />
+              <Route path="/minha" element={<CarreiraLinkedinPage />} />
+              <Route path="/explorar" element={<CarreiraExplorarPage />} />
+              <Route path="/conexoes" element={<CarreiraConexoesPage />} />
+              <Route path="/termos" element={<TermosPage />} />
+              <Route path="/privacidade" element={<PrivacidadePage />} />
+              <Route path="/contato" element={<ContatoPage />} />
+              <Route path="/perfil/:userId" element={<PerfilPage />} />
+              <Route path="/escola/:slug" element={<EscolaPerfilPage />} />
+              {/* Atleta ID / escolinhas — rotas secundárias */}
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/login" element={<Auth />} />
+              <Route path="/install" element={<InstallApp />} />
+              <Route path="/indicacao" element={<IndicacaoPage />} />
+              <Route path="/i" element={<ShortIndicacaoRedirect />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/*" element={<Dashboard />} />
+              {/* Perfil público por slug — deve ficar por último */}
+              <Route path="/:slug" element={<CarreiraPerfilPage />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
