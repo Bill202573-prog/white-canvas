@@ -97,7 +97,7 @@ export function useEventoPresencas(eventoId: string | undefined) {
             escola_confirmou_em: presenca?.escola_confirmou_em ?? null,
             presente: presenca?.presente ?? null,
             observacoes: presenca?.observacoes ?? null,
-            crianca: aluno.crianca as { id: string; nome: string; foto_url: string | null },
+            crianca: aluno.crianca as unknown as { id: string; nome: string; foto_url: string | null },
           };
         });
 

@@ -170,7 +170,7 @@ export const useAdminData = () => {
       // Calculate active students per escolinha
       const alunosPorEscolinha: Record<string, number> = {};
       alunosData?.forEach(ce => {
-        const crianca = ce.crianca as { ativo: boolean } | null;
+        const crianca = ce.crianca as unknown as { ativo: boolean } | null;
         if (crianca?.ativo) {
           alunosPorEscolinha[ce.escolinha_id] = (alunosPorEscolinha[ce.escolinha_id] || 0) + 1;
         }
@@ -265,7 +265,7 @@ export const useAdminData = () => {
 
       const planoCounts: Record<string, number> = {};
       financeiroData?.forEach((f) => {
-        const planoNome = (f.plano as PlanoSaas | null)?.nome || 'Sem plano';
+        const planoNome = (f.plano as unknown as PlanoSaas | null)?.nome || 'Sem plano';
         planoCounts[planoNome] = (planoCounts[planoNome] || 0) + 1;
       });
 

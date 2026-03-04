@@ -194,7 +194,7 @@ const SchoolFinanceiroPage = () => {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      return data as EscolinhaFinanceiro | null;
+      return data as unknown as EscolinhaFinanceiro | null;
     },
     enabled: !!user?.escolinhaId,
   });
@@ -223,7 +223,7 @@ const SchoolFinanceiroPage = () => {
         .order('mes_referencia', { ascending: false });
 
       if (error) throw error;
-      return (data || []) as HistoricoCobrancaSaas[];
+      return (data || []) as unknown as HistoricoCobrancaSaas[];
     },
     enabled: !!user?.escolinhaId,
   });

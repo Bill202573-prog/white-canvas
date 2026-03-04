@@ -39,9 +39,7 @@ import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
-import type { Database } from '@/integrations/supabase/types';
-
-type IndicacaoStatus = Database['public']['Enums']['indicacao_status'];
+type IndicacaoStatus = 'novo' | 'contatado' | 'matriculado' | 'nao_convertido';
 
 const statusLabels: Record<IndicacaoStatus, string> = {
   novo: 'Novo',

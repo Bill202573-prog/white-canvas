@@ -143,7 +143,7 @@ const FinanceiroConsolidado = ({ children }: FinanceiroConsolidadoProps) => {
       return (data || []).map(m => ({
         ...m,
         crianca: childrenMap.get(m.crianca_id) || { id: m.crianca_id, nome: 'Aluno', foto_url: null },
-      })) as MensalidadeWithChild[];
+      })) as unknown as MensalidadeWithChild[];
     },
     enabled: childIds.length > 0,
   });

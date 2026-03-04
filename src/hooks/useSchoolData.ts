@@ -148,7 +148,7 @@ export const useSchoolChildren = () => {
         .eq('ativo', true);
       
       if (error) throw error;
-      return data?.map(d => d.crianca).filter(Boolean) as Crianca[];
+      return data?.map(d => d.crianca).filter(Boolean) as unknown as Crianca[];
     },
     enabled: !!user?.escolinhaId,
   });
@@ -309,8 +309,8 @@ export const useSchoolChildrenWithRelations = (overrideEscolinhaId?: string, inc
         const childEscolinhas: EscolinhaBasic[] = allEscolinhaRelations
           ?.filter(er => er.crianca_id === crianca.id && er.escolinha)
           .map(er => ({
-            id: (er.escolinha as { id: string; nome: string }).id,
-            nome: (er.escolinha as { id: string; nome: string }).nome,
+            id: (er.escolinha as unknown as { id: string; nome: string }).id,
+            nome: (er.escolinha as unknown as { id: string; nome: string }).nome,
             data_inicio: er.data_inicio,
             data_fim: er.data_fim,
             ativo: er.ativo,
@@ -326,7 +326,7 @@ export const useSchoolChildrenWithRelations = (overrideEscolinhaId?: string, inc
           turmas: turmaRelations?.filter(tr => 
             tr.crianca_id === crianca.id && 
             tr.turma && 
-            (tr.turma as Turma).escolinha_id === escolinhaId
+            (tr.turma as unknown as Turma).escolinha_id === escolinhaId
           ).map(tr => ({ turma: tr.turma })) || [],
           responsaveis: responsavelRelations?.filter(rr => rr.crianca_id === crianca.id).map(rr => ({ 
             responsavel: rr.responsavel, 

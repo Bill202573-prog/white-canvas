@@ -99,7 +99,7 @@ const MensalidadeHistoricoList = ({ criancaId, canDelete = false }: MensalidadeH
         .order('mes_referencia', { ascending: false });
 
       if (error) throw error;
-      return data as Mensalidade[];
+      return data as unknown as Mensalidade[];
     },
     enabled: !!criancaId,
   });
