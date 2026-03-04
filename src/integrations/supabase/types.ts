@@ -294,6 +294,9 @@ export type Database = {
       }
       perfil_atleta: {
         Row: {
+          atleta_app_id: string | null
+          atleta_id_sync_at: string | null
+          atleta_id_vinculado: boolean
           banner_url: string | null
           bio: string | null
           categoria: string | null
@@ -313,6 +316,7 @@ export type Database = {
           modalidade: string
           modalidades: string[] | null
           nome: string
+          origem: string
           slug: string
           status_conta: string | null
           telefone_whatsapp: string | null
@@ -322,6 +326,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          atleta_app_id?: string | null
+          atleta_id_sync_at?: string | null
+          atleta_id_vinculado?: boolean
           banner_url?: string | null
           bio?: string | null
           categoria?: string | null
@@ -341,6 +348,7 @@ export type Database = {
           modalidade?: string
           modalidades?: string[] | null
           nome: string
+          origem?: string
           slug: string
           status_conta?: string | null
           telefone_whatsapp?: string | null
@@ -350,6 +358,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          atleta_app_id?: string | null
+          atleta_id_sync_at?: string | null
+          atleta_id_vinculado?: boolean
           banner_url?: string | null
           bio?: string | null
           categoria?: string | null
@@ -369,6 +380,7 @@ export type Database = {
           modalidade?: string
           modalidades?: string[] | null
           nome?: string
+          origem?: string
           slug?: string
           status_conta?: string | null
           telefone_whatsapp?: string | null

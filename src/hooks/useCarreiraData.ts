@@ -23,6 +23,10 @@ export interface PerfilAtleta {
   crianca_id?: string | null;
   followers_count: number;
   conexoes_count: number;
+  origem: string;
+  atleta_app_id: string | null;
+  atleta_id_vinculado: boolean;
+  atleta_id_sync_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -235,6 +239,7 @@ export function useCreatePerfilAtleta() {
           modalidade: data.modalidade || 'Futebol',
           categoria: data.categoria, cidade: data.cidade, estado: data.estado,
           bio: data.bio, foto_url: data.foto_url, crianca_id: data.crianca_id,
+          origem: 'carreira',
         })
         .select()
         .single();

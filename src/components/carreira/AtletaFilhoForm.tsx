@@ -153,6 +153,7 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
           cpf_cnpj: cleanDoc,
           tipo_documento: 'cpf',
           telefone_whatsapp: cleanPhone,
+          origem: 'carreira',
         } as any);
 
       if (perfilError) throw perfilError;

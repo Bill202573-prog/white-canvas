@@ -116,6 +116,7 @@ export function useCreatePerfilAtleta() {
           estado: data.estado,
           bio: data.bio,
           foto_url: data.foto_url,
+          origem: 'carreira',
         })
         .select()
         .single();
