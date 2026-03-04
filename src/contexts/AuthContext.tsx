@@ -59,16 +59,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .single();
 
-      if (!roleData || !profileData) {
-        console.warn('[AuthContext] fetchUserData: missing data', { roleData, roleError, profileData, profileError });
+      if (!profileData) {
+        console.warn('[AuthContext] fetchUserData: missing profile', { profileError });
         return null;
       }
+
+      // If no role exists yet (e.g. Google OAuth race condition), default to 'guardian'
+      const userRole = roleData?.role || 'guardian';
 
       let escolinhaId: string | undefined;
       let escolinhaNome: string | undefined;
 
       // Se for escola, buscar a escolinha
-      if (roleData.role === 'school') {
+      if (userRole === 'school') {
         // Primeiro tenta como admin principal
         const { data: escolinhaAdmin } = await supabase
           .from('escolinhas')
@@ -92,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Se for professor, buscar a escolinha
-      if (roleData.role === 'teacher') {
+      if (userRole === 'teacher') {
         const { data: professorData } = await supabase
           .from('professores')
           .select('escolinha_id')
@@ -106,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return {
         id: userId,
         email: profileData.email,
-        role: roleData.role as UserRole,
+        role: userRole as UserRole,
         name: profileData.nome,
         avatarUrl: profileData.avatar_url,
         escolinhaId,
