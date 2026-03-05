@@ -90,13 +90,20 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
       return;
     }
     const cleanDoc = cpf.replace(/\D/g, '');
-    if (cleanDoc && !validateCPF(cleanDoc)) {
+    // Only validate CPF if user typed exactly 11 digits; partial input is cleared
+    const validCpf = cleanDoc.length === 11 && validateCPF(cleanDoc);
+    if (cleanDoc.length > 0 && cleanDoc.length < 11) {
+      // Partial CPF — warn but allow clearing
+      toast.error('CPF incompleto. Complete os 11 dígitos ou apague o campo.');
+      return;
+    }
+    if (cleanDoc.length === 11 && !validCpf) {
       toast.error('CPF do responsável inválido. Corrija ou deixe em branco.');
       return;
     }
     const cleanPhone = telefoneWhatsapp.replace(/\D/g, '');
-    if (cleanPhone && cleanPhone.length < 10) {
-      toast.error('WhatsApp inválido. Informe com DDD ou deixe em branco.');
+    if (cleanPhone.length > 0 && cleanPhone.length < 10) {
+      toast.error('WhatsApp incompleto. Informe com DDD ou apague o campo.');
       return;
     }
 
