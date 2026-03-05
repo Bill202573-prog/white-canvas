@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2, Upload, Shield, Lock } from 'lucide-react';
-import { validateCPF, formatCPF, cleanCPF } from '@/lib/cpf-validator';
+import { validateCPF, formatCPF } from '@/lib/cpf-validator';
 
 interface Props {
   userId: string;
@@ -89,22 +89,30 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
       toast.error('Nome do responsável é obrigatório');
       return;
     }
-    const cleanDoc = cpf.replace(/\D/g, '');
-    // Only validate CPF if user typed exactly 11 digits; partial input is cleared
-    const validCpf = cleanDoc.length === 11 && validateCPF(cleanDoc);
-    if (cleanDoc.length > 0 && cleanDoc.length < 11) {
-      // Partial CPF — warn but allow clearing
-      toast.error('CPF incompleto. Complete os 11 dígitos ou apague o campo.');
-      return;
+    const cleanDocInput = cpf.replace(/\D/g, '');
+    let cleanDoc: string | null = null;
+
+    const cleanPhoneInput = telefoneWhatsapp.replace(/\D/g, '');
+    let cleanPhone: string | null = null;
+
+    const ignoredFields: string[] = [];
+
+    if (cleanDocInput.length === 11 && validateCPF(cleanDocInput)) {
+      cleanDoc = cleanDocInput;
+    } else if (cleanDocInput.length > 0) {
+      ignoredFields.push('CPF');
     }
-    if (cleanDoc.length === 11 && !validCpf) {
-      toast.error('CPF do responsável inválido. Corrija ou deixe em branco.');
-      return;
+
+    if (cleanPhoneInput.length >= 10 && cleanPhoneInput.length <= 11) {
+      cleanPhone = cleanPhoneInput;
+    } else if (cleanPhoneInput.length > 0) {
+      ignoredFields.push('WhatsApp');
     }
-    const cleanPhone = telefoneWhatsapp.replace(/\D/g, '');
-    if (cleanPhone.length > 0 && cleanPhone.length < 10) {
-      toast.error('WhatsApp incompleto. Informe com DDD ou apague o campo.');
-      return;
+
+    if (ignoredFields.length > 0) {
+      toast.warning(
+        `${ignoredFields.join(' e ')} inválido(s). O cadastro vai continuar sem esses dados; você pode corrigir depois no perfil.`
+      );
     }
 
     setIsLoading(true);
