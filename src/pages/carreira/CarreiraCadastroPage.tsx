@@ -16,7 +16,6 @@ import { InvitePage } from '@/components/carreira/InvitePage';
 import logoAtletaId from '@/assets/logo-atleta-id.png';
 import logoCarreiraId from '@/assets/logo-carreira-id-dark.png';
 import { carreiraPath, isCarreiraDomain } from '@/hooks/useCarreiraBasePath';
-import { lovable } from '@/integrations/lovable';
 import PwaInstallButton from '@/components/shared/PwaInstallButton';
 
 type Step = 'tutorial' | 'auth' | 'profile-type' | 'profile-form' | 'invites';
@@ -222,32 +221,38 @@ export default function CarreiraCadastroPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const redirectUrl = `${window.location.origin}${carreiraPath('/cadastro')}${inviteCode ? `?convite=${inviteCode}` : ''}`;
-      
-      const isCustomDomain = isCarreiraDomain() || 
-        window.location.hostname === 'atletaid.com.br' || 
-        window.location.hostname === 'www.atletaid.com.br';
+      const basePath = carreiraPath('/cadastro');
+      const inviteQuery = inviteCode ? `?convite=${inviteCode}` : '';
+      const isPreviewDomain =
+        window.location.hostname.includes('lovableproject.com') ||
+        window.location.hostname.includes('lovable.app');
 
-      if (isCustomDomain) {
-        // Custom domains: use Supabase OAuth directly (redirect URL configured in Google Console)
-        const { data, error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: redirectUrl,
-            skipBrowserRedirect: true,
-          },
-        });
-        if (error) throw error;
-        if (data?.url) {
+      const redirectUrl = isPreviewDomain
+        ? `https://carreiraid.com.br${basePath}${inviteQuery}`
+        : `${window.location.origin}${basePath}${inviteQuery}`;
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.url) throw new Error('Não foi possível iniciar o login com Google');
+
+      if (isPreviewDomain) {
+        const popup = window.open(data.url, '_blank', 'noopener,noreferrer');
+        if (!popup) {
           window.location.href = data.url;
+        } else {
+          toast.info('Conclua o login na nova aba e volte para continuar.');
         }
-      } else {
-        // Lovable preview / other domains: use Lovable OAuth broker
-        const result = await lovable.auth.signInWithOAuth('google', {
-          redirect_uri: redirectUrl,
-        });
-        if (result.error) throw result.error;
+        return;
       }
+
+      window.location.href = data.url;
     } catch (error: any) {
       console.error('Google login error:', error);
       toast.error('Erro ao fazer login com Google');
