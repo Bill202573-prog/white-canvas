@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut, User, Home, ArrowLeft } from 'lucide-react';
-import logoAtletaId from '@/assets/logo-atleta-id.png';
+import logoCarreira from '@/assets/logo-carreira-id-dark.png';
 import { carreiraPath } from '@/hooks/useCarreiraBasePath';
 
 interface CarreiraLayoutProps {
@@ -34,11 +34,11 @@ export function CarreiraLayout({ children }: CarreiraLayoutProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800">
-        <div className="container flex items-center justify-between h-14 px-4">
+        <div className="container flex items-center justify-between h-20 px-4">
           {/* Logo e identidade */}
           <div className="flex items-center gap-3">
             <Link to={carreiraPath('/minha')} className="flex items-center gap-2">
-              <img src={logoAtletaId} alt="Carreira" className="h-8" />
+              <img src={logoCarreira} alt="Carreira ID" className="h-14" />
             </Link>
             <span className="hidden sm:inline text-xs text-muted-foreground border-l pl-3">
               Carreira Esportiva
@@ -101,9 +101,10 @@ export function CarreiraLayout({ children }: CarreiraLayoutProps) {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 mt-12 py-6 bg-white/50 dark:bg-slate-900/50">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>Carreira Esportiva — Sua trajetória no esporte</p>
+      <footer className="border-t border-slate-200 dark:border-slate-800 mt-12 py-8 bg-black">
+        <div className="container flex flex-col items-center gap-3">
+          <img src={logoCarreira} alt="Carreira ID" className="h-14" />
+          <p className="text-xs text-slate-400">Carreira Esportiva — Sua trajetória no esporte</p>
         </div>
       </footer>
     </div>

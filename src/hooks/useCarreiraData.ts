@@ -472,7 +472,7 @@ export function usePostLike(postId: string) {
 
       return { previousLiked, previousFeeds };
     },
-    onError: (_err, _vars, context) => {
+    onError: (err: any, _vars, context) => {
       // Rollback on error
       if (context) {
         queryClient.setQueryData(['post-like', postId, user?.id], context.previousLiked);
@@ -480,6 +480,7 @@ export function usePostLike(postId: string) {
           queryClient.setQueryData(JSON.parse(key), data);
         });
       }
+      toast.error('Erro ao curtir: ' + (err?.message || 'tente novamente'));
     },
     onSettled: () => {
       // Sync with server

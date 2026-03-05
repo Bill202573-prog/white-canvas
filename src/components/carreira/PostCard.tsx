@@ -75,7 +75,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
     const url = `${window.location.origin}${authorLink}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title: `Post de ${authorName}`, text: post.texto.substring(0, 100), url });
+        await navigator.share({ title: `Post de ${authorName} - Carreira ID`, text: post.texto.substring(0, 100), url });
       } else {
         await navigator.clipboard.writeText(url);
         toast.success('Link copiado!');
@@ -93,7 +93,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
 
   const handleSend = () => {
     const url = `${window.location.origin}${authorLink}`;
-    const text = `Confira o post de ${authorName}: ${url}`;
+    const text = `Confira o post de ${authorName} no Carreira ID: ${url}`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
