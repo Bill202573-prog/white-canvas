@@ -45,6 +45,8 @@ export default function CarreiraCadastroPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [selectedType, setSelectedType] = useState<ProfileType | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
+  // Track if login was initiated locally (email/password or signup) to skip cross-domain redirect
+  const [localLogin, setLocalLogin] = useState(false);
 
   // Auth check + cross-domain session transfer
   useEffect(() => {
@@ -57,13 +59,14 @@ export default function CarreiraCadastroPage() {
 
     let handled = false;
 
-    const handleSession = async (session: any): Promise<boolean> => {
+    const handleSession = async (session: any, skipRedirect?: boolean): Promise<boolean> => {
       if (!session?.user) return false;
       if (handled) return true;
       handled = true;
 
       // If on wrong domain (Lovable preview), transfer session to canonical domain
-      if (isWrongDomain && session.access_token && session.refresh_token) {
+      // But skip if login was initiated locally (email/password)
+      if (isWrongDomain && !skipRedirect && session.access_token && session.refresh_token) {
         const { data: existing } = await supabase
           .from('perfis_rede')
           .select('id, slug')
@@ -78,7 +81,7 @@ export default function CarreiraCadastroPage() {
         return true;
       }
 
-      // Normal flow on correct domain
+      // Normal flow
       setUserId(session.user.id);
 
       try {
@@ -121,7 +124,7 @@ export default function CarreiraCadastroPage() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
-        const result = await handleSession(session);
+        const result = await handleSession(session, localLogin);
         if (!result) setCheckingAuth(false);
       }
     });
@@ -137,11 +140,12 @@ export default function CarreiraCadastroPage() {
       subscription.unsubscribe();
       clearTimeout(timeout);
     };
-  }, [navigate, inviteCode]);
+  }, [navigate, inviteCode, localLogin]);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLocalLogin(true);
 
     try {
       if (isLogin) {
