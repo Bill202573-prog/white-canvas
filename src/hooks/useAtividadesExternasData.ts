@@ -237,35 +237,62 @@ export const useUpdateAtividadeExterna = () => {
       crianca_id,
       ...updates 
     }: Partial<AtividadeExterna> & { id: string; crianca_id: string }) => {
+      const tornarPublicoChanged = typeof updates.tornar_publico === 'boolean';
+
+      const sanitizedUpdates: Record<string, unknown> = Object.fromEntries(
+        Object.entries(updates).filter(([, value]) => value !== undefined)
+      );
+
+      const nullableTextFields = [
+        'tipo_outro_descricao',
+        'data_fim',
+        'organizador',
+        'torneio_nome',
+        'metodologia',
+        'observacoes',
+        'evidencia_url',
+        'evidencia_tipo',
+      ];
+
+      nullableTextFields.forEach((field) => {
+        if (sanitizedUpdates[field] === '') {
+          sanitizedUpdates[field] = null;
+        }
+      });
+
+      if (sanitizedUpdates.torneio_abrangencia === '') {
+        sanitizedUpdates.torneio_abrangencia = null;
+      }
+
+      if (
+        Array.isArray(sanitizedUpdates.profissionais_envolvidos) &&
+        sanitizedUpdates.profissionais_envolvidos.length === 0
+      ) {
+        sanitizedUpdates.profissionais_envolvidos = null;
+      }
+
       // Atualizar credibilidade se evidência ou fotos foram adicionadas/removidas
-      let credibilidade_status = updates.credibilidade_status;
-      const hasEvidence = updates.evidencia_url || (updates.fotos_urls && updates.fotos_urls.length > 0);
-      if ('evidencia_url' in updates || 'fotos_urls' in updates) {
+      let credibilidade_status = sanitizedUpdates.credibilidade_status as CredibilidadeStatus | undefined;
+      const fotos = sanitizedUpdates.fotos_urls;
+      const hasEvidence = Boolean(sanitizedUpdates.evidencia_url) || (Array.isArray(fotos) && fotos.length > 0);
+
+      if ('evidencia_url' in sanitizedUpdates || 'fotos_urls' in sanitizedUpdates) {
         credibilidade_status = hasEvidence ? 'com_evidencia' : 'registrado';
       }
 
-      // Build the update payload explicitly
-      const updatePayload: Record<string, unknown> = { ...updates };
-      
-      // Always include credibilidade_status if it was determined
       if (credibilidade_status) {
-        updatePayload.credibilidade_status = credibilidade_status;
-      }
-      
-      // Ensure tornar_publico is explicitly set when provided (including false)
-      if (typeof updates.tornar_publico === 'boolean') {
-        updatePayload.tornar_publico = updates.tornar_publico;
+        sanitizedUpdates.credibilidade_status = credibilidade_status;
       }
 
       const { data, error } = await supabase
         .from('atividades_externas')
-        .update(updatePayload)
+        .update(sanitizedUpdates)
         .eq('id', id)
         .select()
         .single();
 
       if (error) throw error;
-      return { data, crianca_id, tornarPublicoChanged: typeof updates.tornar_publico === 'boolean' };
+      return { data, crianca_id, tornarPublicoChanged };
     },
     onSuccess: (result) => {
       // Always invalidate the child's activities

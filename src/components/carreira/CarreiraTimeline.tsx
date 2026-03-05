@@ -110,13 +110,15 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
         .from('atividades_externas')
         .select('*')
         .eq('id', atv.id)
-        .single();
+        .maybeSingle();
+
       if (error) throw error;
-      setEditingActivity(data as AtividadeExterna);
+      setEditingActivity((data as AtividadeExterna) || (atv as AtividadeExterna));
     } catch {
       // Fallback to partial data
       setEditingActivity(atv as AtividadeExterna);
     }
+
     setAtividadeFormOpen(true);
   };
 

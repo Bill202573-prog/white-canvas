@@ -79,6 +79,12 @@ const AtividadeExternaPhotoUpload = ({
     setUploading(true);
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const authUserId = sessionData.session?.user?.id;
+      if (!authUserId) {
+        throw new Error('Usuário não autenticado para enviar fotos');
+      }
+
       const uploadedUrls: string[] = [];
 
       for (let file of filesToUpload) {
@@ -89,9 +95,8 @@ const AtividadeExternaPhotoUpload = ({
         const randomStr = Math.random().toString(36).substring(2, 11);
         const fileName = `${timestamp}-${randomStr}.${fileExt}`;
         
-        // Use criancaId as folder path for RLS policies
-        // Format: criancaId/timestamp-random.ext (simpler path structure)
-        const filePath = `${criancaId}/${fileName}`;
+        // Storage policy requires the first folder to be auth.uid()
+        const filePath = `${authUserId}/${criancaId}/${fileName}`;
 
         console.log('[AtividadeExternaPhotoUpload] Uploading to path:', filePath);
         console.log('[AtividadeExternaPhotoUpload] File size:', file.size, 'bytes');
