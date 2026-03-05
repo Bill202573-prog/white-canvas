@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Loader2, Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Loader2, Mail, Lock, User, ArrowLeft, LogOut } from 'lucide-react';
 import { z } from 'zod';
 import { ProfileTypeSelector, type ProfileType } from '@/components/carreira/ProfileTypeSelector';
 import { ProfileTypeForm } from '@/components/carreira/ProfileTypeForm';
@@ -317,21 +317,43 @@ export default function CarreiraCadastroPage() {
             <ArrowLeft className="w-4 h-4" />
             <img src={currentLogo} alt={brandName} className="h-7" />
           </button>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {['Tutorial', 'Conta', 'Perfil', 'Rede'].map((label, i) => (
-              <span key={label} className="flex items-center gap-1.5">
-                {i > 0 && <span className="text-border">›</span>}
-                <span className={
-                  (i === 0 && step === 'tutorial') ||
-                  (i === 1 && step === 'auth') || 
-                  (i === 2 && (step === 'profile-type' || step === 'profile-form')) || 
-                  (i === 3 && step === 'invites')
-                    ? 'text-primary font-semibold' : ''
-                }>
-                  {label}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {['Tutorial', 'Conta', 'Perfil', 'Rede'].map((label, i) => (
+                <span key={label} className="flex items-center gap-1.5">
+                  {i > 0 && <span className="text-border">›</span>}
+                  <span className={
+                    (i === 0 && step === 'tutorial') ||
+                    (i === 1 && step === 'auth') || 
+                    (i === 2 && (step === 'profile-type' || step === 'profile-form')) || 
+                    (i === 3 && step === 'invites')
+                      ? 'text-primary font-semibold' : ''
+                  }>
+                    {label}
+                  </span>
                 </span>
-              </span>
-            ))}
+              ))}
+            </div>
+            {userId && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setUserId(null);
+                  setStep('tutorial');
+                  setSelectedType(null);
+                  setNome('');
+                  setEmail('');
+                  setPassword('');
+                  toast.success('Sessão encerrada');
+                }}
+              >
+                <LogOut className="w-3 h-3 mr-1" />
+                Sair
+              </Button>
+            )}
           </div>
         </div>
       </header>
