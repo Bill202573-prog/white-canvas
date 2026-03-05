@@ -90,13 +90,13 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
       return;
     }
     const cleanDoc = cpf.replace(/\D/g, '');
-    if (!cleanDoc || !validateCPF(cleanDoc)) {
-      toast.error('CPF do responsável inválido');
+    if (cleanDoc && !validateCPF(cleanDoc)) {
+      toast.error('CPF do responsável inválido. Corrija ou deixe em branco.');
       return;
     }
     const cleanPhone = telefoneWhatsapp.replace(/\D/g, '');
-    if (!cleanPhone || cleanPhone.length < 10) {
-      toast.error('WhatsApp é obrigatório (com DDD)');
+    if (cleanPhone && cleanPhone.length < 10) {
+      toast.error('WhatsApp inválido. Informe com DDD ou deixe em branco.');
       return;
     }
 
@@ -150,9 +150,9 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
           foto_url: fotoUrl,
           crianca_id: criancaId,
           is_public: true,
-          cpf_cnpj: cleanDoc,
-          tipo_documento: 'cpf',
-          telefone_whatsapp: cleanPhone,
+          cpf_cnpj: cleanDoc || null,
+          tipo_documento: cleanDoc ? 'cpf' : null,
+          telefone_whatsapp: cleanPhone || null,
           origem: 'carreira',
         } as any);
 
@@ -246,7 +246,7 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
             />
           </div>
           <div className="space-y-2">
-            <Label>CPF do Responsável *</Label>
+            <Label>CPF do Responsável</Label>
             <Input
               value={cpf}
               onChange={(e) => setCpf(formatCPF(e.target.value))}
@@ -255,7 +255,7 @@ export function AtletaFilhoForm({ userId, defaultName, inviteCode, onBack, onCom
             />
           </div>
           <div className="space-y-2">
-            <Label>WhatsApp do Responsável *</Label>
+            <Label>WhatsApp do Responsável</Label>
             <Input
               value={telefoneWhatsapp}
               onChange={(e) => setTelefoneWhatsapp(formatPhone(e.target.value))}
