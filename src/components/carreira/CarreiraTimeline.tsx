@@ -11,6 +11,7 @@ import { JornadaTimeline } from './JornadaTimeline';
 import { CarreiraAtividadeFormDialog } from './CarreiraAtividadeFormDialog';
 import { ExperienciaFormDialog } from './ExperienciaFormDialog';
 import { useCarreiraAtividadeLimit } from '@/hooks/useCarreiraFreemium';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Loader2, FileText, Building2, BarChart3, Dumbbell, Swords, Medal, Plus, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -102,8 +103,20 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
     return startFormatted;
   };
 
-  const handleEditActivity = (atv: any) => {
-    setEditingActivity(atv as AtividadeExterna);
+  const handleEditActivity = async (atv: any) => {
+    // Fetch full record for editing (public query only has subset of fields)
+    try {
+      const { data, error } = await supabase
+        .from('atividades_externas')
+        .select('*')
+        .eq('id', atv.id)
+        .single();
+      if (error) throw error;
+      setEditingActivity(data as AtividadeExterna);
+    } catch {
+      // Fallback to partial data
+      setEditingActivity(atv as AtividadeExterna);
+    }
     setAtividadeFormOpen(true);
   };
 

@@ -43,13 +43,14 @@ function renderTextWithLinks(text: string) {
 
 export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps) {
   const { user } = useAuth();
-  const { isLiked, toggleLike } = usePostLike(post.id);
+  const { isLiked, toggleLike, effectiveUserId } = usePostLike(post.id);
   const deletePost = useDeletePostAtleta();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState('');
   const { data: comments } = usePostComments(post.id);
   const createComment = useCreateComment();
+  const isAuthenticated = !!user?.id || !!effectiveUserId;
 
   // Resolve author from perfil_atleta or perfis_rede
   const perfilAtleta = post.perfil;
@@ -103,8 +104,10 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
   };
 
   const handleComment = async () => {
-    if (!commentText.trim() || !user?.id) return;
-    await createComment.mutateAsync({ postId: post.id, texto: commentText.trim(), userId: user.id });
+    if (!commentText.trim()) return;
+    const uid = user?.id || effectiveUserId;
+    if (!uid) { toast.error('Faça login para comentar'); return; }
+    await createComment.mutateAsync({ postId: post.id, texto: commentText.trim(), userId: uid });
     setCommentText('');
   };
 
@@ -197,7 +200,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
         <CardFooter className="px-2 py-0 border-t" style={accentColor ? { borderColor: `${accentColor}20` } : undefined}>
           <div className="flex items-center w-full">
             <Button variant="ghost" size="sm"
-              onClick={() => { if (user) toggleLike.mutate(); else toast.error('Faça login para curtir'); }}
+              onClick={() => { if (isAuthenticated) toggleLike.mutate(); else toast.error('Faça login para curtir'); }}
               disabled={toggleLike.isPending}
               className={cn("flex-col gap-0.5 flex-1 h-12 text-[11px] rounded-none py-1 hover:bg-orange-100/50", isLiked && "text-orange-600 font-semibold")}>
               <ThumbsUp className={cn("w-5 h-5", isLiked && "fill-current")} />
@@ -205,7 +208,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
             </Button>
             
             <Button variant="ghost" size="sm" className="flex-col gap-0.5 flex-1 h-12 text-[11px] rounded-none py-1 hover:bg-blue-100/50"
-              onClick={() => { if (!user) { toast.error('Faça login para comentar'); return; } setShowComments(!showComments); }}>
+              onClick={() => { if (!isAuthenticated) { toast.error('Faça login para comentar'); return; } setShowComments(!showComments); }}>
               <MessageCircle className="w-5 h-5 text-blue-600" />
               Comentar
             </Button>
@@ -235,7 +238,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
                 </div>
               </div>
             ))}
-            {user && (
+            {isAuthenticated && (
               <div className="flex gap-2 items-center">
                 <Avatar className="w-6 h-6">
                   <AvatarFallback className="text-[10px]"><User className="w-3 h-3" /></AvatarFallback>

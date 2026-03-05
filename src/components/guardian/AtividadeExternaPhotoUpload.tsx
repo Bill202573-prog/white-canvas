@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Camera, X, Loader2, ImagePlus } from 'lucide-react';
 import { toast } from 'sonner';
+import { compressImage } from '@/lib/image-compressor';
 
 interface AtividadeExternaPhotoUploadProps {
   criancaId: string;
@@ -80,7 +81,9 @@ const AtividadeExternaPhotoUpload = ({
     try {
       const uploadedUrls: string[] = [];
 
-      for (const file of filesToUpload) {
+      for (let file of filesToUpload) {
+        // Compress image before upload
+        file = await compressImage(file, { maxWidth: 1920, quality: 0.85 });
         const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
         const timestamp = Date.now();
         const randomStr = Math.random().toString(36).substring(2, 11);

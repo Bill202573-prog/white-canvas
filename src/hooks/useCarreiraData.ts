@@ -510,7 +510,7 @@ export function usePostLike(postId: string) {
     },
   });
 
-  return { isLiked: !!isLiked, toggleLike };
+  return { isLiked: !!isLiked, toggleLike, effectiveUserId };
 }
 
 // Hook for post comments
@@ -652,13 +652,14 @@ async function convertHeicIfNeeded(file: File): Promise<File> {
 
 // Upload image for post
 export async function uploadPostImage(file: File, userId: string): Promise<string> {
-  const converted = await convertHeicIfNeeded(file);
-  const fileExt = converted.name.split('.').pop();
+  const { compressImage } = await import('@/lib/image-compressor');
+  const compressed = await compressImage(await convertHeicIfNeeded(file), { maxWidth: 1920, quality: 0.85 });
+  const fileExt = compressed.name.split('.').pop();
   const fileName = `${userId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from('atleta-posts')
-    .upload(fileName, converted);
+    .upload(fileName, compressed);
 
   if (uploadError) throw uploadError;
 
@@ -671,13 +672,14 @@ export async function uploadPostImage(file: File, userId: string): Promise<strin
 
 // Upload profile photo
 export async function uploadProfilePhoto(file: File, userId: string): Promise<string> {
-  const converted = await convertHeicIfNeeded(file);
-  const fileExt = converted.name.split('.').pop();
+  const { compressImage } = await import('@/lib/image-compressor');
+  const compressed = await compressImage(await convertHeicIfNeeded(file), { maxWidth: 800, quality: 0.85 });
+  const fileExt = compressed.name.split('.').pop();
   const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from('atleta-fotos')
-    .upload(fileName, converted, { upsert: true });
+    .upload(fileName, compressed, { upsert: true });
 
   if (uploadError) throw uploadError;
 
