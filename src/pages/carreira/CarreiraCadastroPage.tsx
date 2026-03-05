@@ -154,7 +154,13 @@ export default function CarreiraCadastroPage() {
 
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
-          toast.error(error.message.includes('Invalid login') ? 'Email ou senha incorretos' : error.message);
+          if (error.message.includes('Email not confirmed')) {
+            toast.error('Seu email ainda não foi confirmado. Verifique sua caixa de entrada.');
+          } else if (error.message.includes('Invalid login')) {
+            toast.error('Email ou senha incorretos');
+          } else {
+            toast.error(error.message);
+          }
         } else if (data.user) {
           setUserId(data.user.id);
           const { data: perfilAtleta } = await supabase
