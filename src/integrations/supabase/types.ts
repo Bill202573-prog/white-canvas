@@ -292,6 +292,39 @@ export type Database = {
         }
         Relationships: []
       }
+      crianca_escolinha: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          crianca_id: string
+          data_fim: string | null
+          data_inicio: string
+          escolinha_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          crianca_id: string
+          data_fim?: string | null
+          data_inicio?: string
+          escolinha_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          crianca_id?: string
+          data_fim?: string | null
+          data_inicio?: string
+          escolinha_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       criancas: {
         Row: {
           ativo: boolean
@@ -563,7 +596,22 @@ export type Database = {
           updated_at?: string
           visibilidade?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "posts_atleta_autor_id_fkey"
+            columns: ["autor_id"]
+            isOneToOne: false
+            referencedRelation: "perfil_atleta"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_atleta_perfil_rede_id_fkey"
+            columns: ["perfil_rede_id"]
+            isOneToOne: false
+            referencedRelation: "perfis_rede"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
