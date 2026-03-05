@@ -16,6 +16,7 @@ import { InvitePage } from '@/components/carreira/InvitePage';
 import logoAtletaId from '@/assets/logo-atleta-id.png';
 import logoCarreiraId from '@/assets/logo-carreira-id-dark.png';
 import { carreiraPath, isCarreiraDomain } from '@/hooks/useCarreiraBasePath';
+import { lovable } from '@/integrations/lovable';
 import PwaInstallButton from '@/components/shared/PwaInstallButton';
 
 type Step = 'tutorial' | 'auth' | 'profile-type' | 'profile-form' | 'invites';
@@ -228,6 +229,7 @@ export default function CarreiraCadastroPage() {
         window.location.hostname === 'www.atletaid.com.br';
 
       if (isCustomDomain) {
+        // Custom domains: use Supabase OAuth directly (redirect URL configured in Google Console)
         const { data, error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
@@ -240,13 +242,11 @@ export default function CarreiraCadastroPage() {
           window.location.href = data.url;
         }
       } else {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: redirectUrl,
-          },
+        // Lovable preview / other domains: use Lovable OAuth broker
+        const result = await lovable.auth.signInWithOAuth('google', {
+          redirect_uri: redirectUrl,
         });
-        if (error) throw error;
+        if (result.error) throw result.error;
       }
     } catch (error: any) {
       console.error('Google login error:', error);
