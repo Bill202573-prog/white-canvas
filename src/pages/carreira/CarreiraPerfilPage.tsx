@@ -503,7 +503,7 @@ export default function CarreiraPerfilPage() {
           
           {/* Left Sidebar — Athlete Card */}
           <aside className="hidden lg:block space-y-4">
-            <Card className="text-center border overflow-hidden" style={{ borderColor: `${accentColor}30`, backgroundColor: 'hsl(220 12% 10%)' }}>
+            <Card className="text-center overflow-hidden" style={{ borderColor: `${accentColor}50`, borderWidth: 2, backgroundColor: 'hsl(220 12% 10%)' }}>
               {/* Banner */}
               {perfil.banner_url && (
                 <div className="h-20 w-full overflow-hidden">
@@ -593,7 +593,7 @@ export default function CarreiraPerfilPage() {
 
             {/* Escolinhas vinculadas */}
             {escolinhas && escolinhas.length > 0 && (
-              <Card className="p-4 border" style={{ borderColor: `${accentColor}25` }}>
+              <Card className="p-4" style={{ borderColor: `${accentColor}50`, borderWidth: 2 }}>
                 <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
                   <School className="w-3.5 h-3.5" />
                   Escolinhas ({escolinhas.length})
@@ -677,10 +677,10 @@ export default function CarreiraPerfilPage() {
             {/* Mobile-only: Pending connection requests */}
             {isOwner && pendingRequests && pendingRequests.length > 0 && (
               <div className="lg:hidden">
-                <Card className="p-4 border" style={{ borderColor: `${accentColor}40` }}>
-                  <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-                    Solicitações de conexão ({pendingRequests.length})
+                <Card className="p-4" style={{ borderColor: `${accentColor}50`, borderWidth: 2 }}>
+                   <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                     <span className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+                     Solicitações de conexão ({pendingRequests.length})
                   </h3>
                   <div className="space-y-3">
                     {pendingRequests.map((person: any) => (
@@ -761,7 +761,7 @@ export default function CarreiraPerfilPage() {
             )}
 
             {currentUserId && suggestions && suggestions.length > 0 && (
-              <Card className="p-4 border" style={{ borderColor: `${accentColor}30` }}>
+              <Card className="p-4" style={{ borderColor: `${accentColor}50`, borderWidth: 2 }}>
                 <h3 className="text-sm font-semibold text-foreground mb-3">Sugestões para conectar</h3>
                 <div className="space-y-3">
                   {suggestions.map((person) => (
@@ -792,10 +792,10 @@ export default function CarreiraPerfilPage() {
 
             {/* Connected people */}
             {connections && connections.length > 0 && (
-              <Card className="p-4 border" style={{ borderColor: `${accentColor}30` }}>
+              <Card className="p-4" style={{ borderColor: `${accentColor}50`, borderWidth: 2 }}>
                 <h3 className="text-xs font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                  <Users className="w-3.5 h-3.5" />
-                  Conectados ({connections.length})
+                   <Users className="w-3.5 h-3.5" />
+                   Conectados ({connections.length})
                 </h3>
                 <div className="space-y-2">
                   {connections.slice(0, 5).map((person) => (
