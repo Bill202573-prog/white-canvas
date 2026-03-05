@@ -273,9 +273,12 @@ export function useUpdatePerfilAtleta() {
       if (error) throw error;
       return perfil as PerfilAtleta;
     },
-    onSuccess: () => {
+    onSuccess: (updatedPerfil) => {
       queryClient.invalidateQueries({ queryKey: ['meu-perfil-atleta'] });
       queryClient.invalidateQueries({ queryKey: ['perfil-atleta'] });
+      queryClient.invalidateQueries({ queryKey: ['carreira-profile-by-slug'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-atleta'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-rede'] });
       toast.success('Perfil atualizado!');
     },
     onError: (error: any) => {

@@ -73,11 +73,21 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
 
   const handleShare = async () => {
     const url = `${window.location.origin}${authorLink}`;
-    if (navigator.share) {
-      try { await navigator.share({ title: `Post de ${authorName}`, text: post.texto.substring(0, 100), url }); } catch { /* cancelled */ }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copiado!');
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: `Post de ${authorName}`, text: post.texto.substring(0, 100), url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copiado!');
+      }
+    } catch {
+      // Fallback if both share and clipboard fail (e.g. iframe)
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link copiado!');
+      } catch {
+        toast.info(url);
+      }
     }
   };
 
@@ -100,7 +110,7 @@ export function PostCard({ post, showAuthor = true, accentColor }: PostCardProps
 
   return (
     <>
-      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow" style={accentColor ? { borderColor: `${accentColor}30`, borderWidth: 1 } : { border: 'none' }}>
+      <Card className="overflow-hidden shadow-md hover:shadow-lg transition-shadow" style={accentColor ? { borderColor: `${accentColor}50`, borderWidth: 2 } : { border: 'none' }}>
         {showAuthor && hasAuthor && (
           <CardHeader className="pb-2 px-3 pt-3">
             <div className="flex items-start justify-between">

@@ -102,7 +102,7 @@ export function PerfilHeader({ perfil, isOwner = false }: PerfilHeaderProps) {
 
   return (
     <>
-      <Card className="overflow-hidden border" style={{ borderColor: `${perfil.cor_destaque || '#3b82f6'}25` }}>
+      <Card className="overflow-hidden" style={{ borderColor: `${perfil.cor_destaque || '#3b82f6'}50`, borderWidth: 2 }}>
         {/* Banner */}
         {perfil.banner_url && (
           <div className="h-28 sm:h-36 w-full overflow-hidden">

@@ -155,7 +155,7 @@ export function CreatePostForm({ perfil, perfilRedeId, perfilRedeNome, perfilRed
   const isSubmitting = uploading || createPost.isPending;
 
   return (
-    <Card className="shadow-md" style={accentColor ? { borderColor: `${accentColor}30`, borderWidth: 1 } : { border: 'none' }}>
+    <Card className="shadow-md" style={accentColor ? { borderColor: `${accentColor}50`, borderWidth: 2 } : { border: 'none' }}>
       <CardContent className="pt-4">
         <div className="flex gap-3">
           <Avatar className="w-10 h-10 flex-shrink-0">
