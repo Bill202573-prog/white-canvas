@@ -537,10 +537,28 @@ export function useCreateComment() {
 
       if (error) throw error;
     },
+    onMutate: async (vars) => {
+      // Optimistically update comments_count in all feed queries
+      const feedKeys = ['posts-atleta', 'posts-rede', 'feed-posts-global', 'feed-posts-connections'];
+      feedKeys.forEach(key => {
+        const queries = queryClient.getQueriesData({ queryKey: [key] });
+        queries.forEach(([queryKey, data]) => {
+          if (Array.isArray(data)) {
+            queryClient.setQueryData(queryKey, (data as PostAtleta[]).map(p =>
+              p.id === vars.postId
+                ? { ...p, comments_count: (p.comments_count || 0) + 1 }
+                : p
+            ));
+          }
+        });
+      });
+    },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ['post-comments', vars.postId] });
       queryClient.invalidateQueries({ queryKey: ['posts-atleta'] });
+      queryClient.invalidateQueries({ queryKey: ['posts-rede'] });
       queryClient.invalidateQueries({ queryKey: ['feed-posts-global'] });
+      queryClient.invalidateQueries({ queryKey: ['feed-posts-connections'] });
     },
     onError: (error: any) => {
       toast.error('Erro ao comentar: ' + error.message);
