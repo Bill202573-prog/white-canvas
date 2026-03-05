@@ -80,14 +80,17 @@ export function AtividadePublicaCard({ atividade, isOwner = false, onEdit, accen
 
   return (
     <>
-      <Card className="overflow-hidden border" style={{ borderColor: `${accentColor}25` }}>
+      <Card className="overflow-hidden" style={{ border: `2px solid ${accentColor}50` }}>
         <CardContent className="pt-4 space-y-3">
           {/* Header with type badge */}
           <div className="flex items-center justify-between">
-            <Badge variant="secondary" className="gap-1.5">
+            <span
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
+              style={{ backgroundColor: `${accentColor}15`, color: accentColor }}
+            >
               {tipoIcon}
               {tipoLabel}
-            </Badge>
+            </span>
             <div className="flex items-center gap-1">
               {atividade.torneio_abrangencia && (
                 <Badge variant="outline" className="text-xs">

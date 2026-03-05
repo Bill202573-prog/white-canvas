@@ -52,6 +52,26 @@ export function useCreateCarreiraExperiencia() {
   });
 }
 
+export function useUpdateCarreiraExperiencia() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: Partial<CarreiraExperiencia> & { id: string; crianca_id: string }) => {
+      const { id, ...rest } = payload;
+      const { data, error } = await supabase
+        .from('carreira_experiencias')
+        .update(rest as any)
+        .eq('id', id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (_, vars) => {
+      queryClient.invalidateQueries({ queryKey: ['carreira-experiencias', vars.crianca_id] });
+    },
+  });
+}
+
 export function useDeleteCarreiraExperiencia() {
   const queryClient = useQueryClient();
   return useMutation({

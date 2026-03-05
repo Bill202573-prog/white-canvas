@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PerfilAtleta, usePostsAtleta, useAtividadesPublicas, useEscolinhasCarreira } from '@/hooks/useCarreiraData';
-import { useCarreiraExperiencias } from '@/hooks/useCarreiraExperienciasData';
+import { useCarreiraExperiencias, useDeleteCarreiraExperiencia, CarreiraExperiencia } from '@/hooks/useCarreiraExperienciasData';
+import { AtividadeExterna } from '@/hooks/useAtividadesExternasData';
 import { CreatePostForm } from './CreatePostForm';
 import { PostCard } from './PostCard';
 import { AtividadePublicaCard } from './AtividadePublicaCard';
@@ -11,16 +12,26 @@ import { CarreiraAtividadeFormDialog } from './CarreiraAtividadeFormDialog';
 import { ExperienciaFormDialog } from './ExperienciaFormDialog';
 import { useCarreiraAtividadeLimit } from '@/hooks/useCarreiraFreemium';
 import { Button } from '@/components/ui/button';
-import { Loader2, FileText, Building2, BarChart3, Dumbbell, Swords, Medal, Plus, Briefcase } from 'lucide-react';
+import { Loader2, FileText, Building2, BarChart3, Dumbbell, Swords, Medal, Plus, Pencil, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 interface CarreiraTimelineProps {
   perfil: PerfilAtleta;
   isOwner?: boolean;
 }
 
-// Tabs for athletes WITH escolinha (institutional)
 const INSTITUTIONAL_TABS = [
   { value: 'experiencia', label: 'Experiência', icon: Building2 },
   { value: 'estatisticas', label: 'Estatísticas', icon: BarChart3 },
@@ -29,7 +40,6 @@ const INSTITUTIONAL_TABS = [
   { value: 'premiacoes', label: 'Premiações', icon: Medal },
 ];
 
-// Tabs for Carreira-origin athletes (LinkedIn-style curriculum)
 const CARREIRA_TABS = [
   { value: 'carreira-experiencia', label: 'Experiência', icon: Building2 },
   { value: 'carreira-atividades', label: 'Atividades', icon: Dumbbell },
@@ -39,28 +49,26 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [atividadeFormOpen, setAtividadeFormOpen] = useState(false);
   const [experienciaFormOpen, setExperienciaFormOpen] = useState(false);
+  const [editingActivity, setEditingActivity] = useState<AtividadeExterna | null>(null);
+  const [editingExperiencia, setEditingExperiencia] = useState<CarreiraExperiencia | null>(null);
+  const [deleteExpId, setDeleteExpId] = useState<string | null>(null);
+
   const { data: posts, isLoading: postsLoading } = usePostsAtleta(perfil.id);
   const isPlatformProfile = perfil.modalidade === 'Plataforma' || !perfil.crianca_id;
   const { data: atividades, isLoading: atividadesLoading } = useAtividadesPublicas(isPlatformProfile ? undefined : perfil.crianca_id);
   const { data: escolinhas, isLoading: escolinhasLoading } = useEscolinhasCarreira(isPlatformProfile ? undefined : perfil.crianca_id);
   const { data: experiencias, isLoading: experienciasLoading } = useCarreiraExperiencias(isPlatformProfile ? undefined : perfil.crianca_id);
   const { data: limitResult } = useCarreiraAtividadeLimit(isOwner && perfil.crianca_id ? perfil.crianca_id : null);
+  const deleteExperiencia = useDeleteCarreiraExperiencia();
 
-  // Determine if athlete has institutional (escolinha) data
   const hasEscolinhaData = (escolinhas?.length || 0) > 0;
   const isCarreiraOnly = !isPlatformProfile && !hasEscolinhaData;
 
   const dadosPublicos = (perfil as any).dados_publicos as {
-    gols?: boolean;
-    campeonatos?: boolean;
-    amistosos?: boolean;
-    premiacoes?: boolean;
-    conquistas?: boolean;
+    gols?: boolean; campeonatos?: boolean; amistosos?: boolean; premiacoes?: boolean; conquistas?: boolean;
   } | undefined;
 
   const accentColor = perfil.cor_destaque || '#3b82f6';
-
-  // Choose which tabs to show
   const activeTabs = isCarreiraOnly ? CARREIRA_TABS : INSTITUTIONAL_TABS;
 
   const handleTabClick = (value: string) => {
@@ -94,11 +102,41 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
     return startFormatted;
   };
 
+  const handleEditActivity = (atv: any) => {
+    setEditingActivity(atv as AtividadeExterna);
+    setAtividadeFormOpen(true);
+  };
+
+  const handleEditExperiencia = (exp: CarreiraExperiencia) => {
+    setEditingExperiencia(exp);
+    setExperienciaFormOpen(true);
+  };
+
+  const handleDeleteExperiencia = async () => {
+    if (!deleteExpId || !perfil.crianca_id) return;
+    try {
+      await deleteExperiencia.mutateAsync({ id: deleteExpId, criancaId: perfil.crianca_id });
+      toast.success('Experiência removida');
+      setDeleteExpId(null);
+    } catch {
+      toast.error('Erro ao remover experiência');
+    }
+  };
+
+  const handleAtividadeFormClose = (open: boolean) => {
+    if (!open) setEditingActivity(null);
+    setAtividadeFormOpen(open);
+  };
+
+  const handleExperienciaFormClose = (open: boolean) => {
+    if (!open) setEditingExperiencia(null);
+    setExperienciaFormOpen(open);
+  };
+
   const renderTabContent = () => {
     if (!activeTab) return null;
 
     switch (activeTab) {
-      // --- Carreira-only tabs ---
       case 'carreira-experiencia':
         return experienciasLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -106,11 +144,21 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
           </div>
         ) : (
           <div className="space-y-3">
-            {renderNewAtividadeButton('Nova Experiência', () => setExperienciaFormOpen(true))}
+            {renderNewAtividadeButton('Nova Experiência', () => {
+              setEditingExperiencia(null);
+              setExperienciaFormOpen(true);
+            })}
             {(experiencias?.length || 0) > 0 ? (
               experiencias?.map((exp) => (
-                <div key={exp.id} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                <div
+                  key={exp.id}
+                  className="flex items-start gap-3 p-3 rounded-lg transition-colors"
+                  style={{ backgroundColor: `${accentColor}08`, borderLeft: `3px solid ${accentColor}50` }}
+                >
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                    style={{ backgroundColor: `${accentColor}15`, color: accentColor }}
+                  >
                     {exp.nome_escola?.[0]}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -127,6 +175,16 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
                       <p className="text-xs text-muted-foreground mt-1">{exp.observacoes}</p>
                     )}
                   </div>
+                  {isOwner && (
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleEditExperiencia(exp)}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => setDeleteExpId(exp.id)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))
             ) : (
@@ -138,6 +196,7 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
             )}
           </div>
         );
+
       case 'carreira-atividades':
         return atividadesLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -145,13 +204,19 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
           </div>
         ) : (
           <div className="space-y-3">
-            {renderNewAtividadeButton('Nova Atividade', () => setAtividadeFormOpen(true))}
+            {renderNewAtividadeButton('Nova Atividade', () => {
+              setEditingActivity(null);
+              setAtividadeFormOpen(true);
+            })}
             {(atividades?.length || 0) > 0 ? (
               atividades?.map((atv) => (
-                <AtividadePublicaCard key={atv.id} atividade={atv} isOwner={isOwner} accentColor={accentColor} onEdit={(a) => {
-                  // Open the form dialog for editing - for now just open new form
-                  setAtividadeFormOpen(true);
-                }} />
+                <AtividadePublicaCard
+                  key={atv.id}
+                  atividade={atv}
+                  isOwner={isOwner}
+                  accentColor={accentColor}
+                  onEdit={handleEditActivity}
+                />
               ))
             ) : (
               <div className="text-center py-12 text-muted-foreground">
@@ -163,20 +228,13 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
           </div>
         );
 
-      // --- Institutional tabs (existing) ---
       case 'experiencia':
         return escolinhasLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
         ) : (
-          <ExperienciaSection
-            perfil={perfil}
-            escolinhas={escolinhas}
-            atividades={[]}
-            isOwner={isOwner}
-            accentColor={accentColor}
-          />
+          <ExperienciaSection perfil={perfil} escolinhas={escolinhas} atividades={[]} isOwner={isOwner} accentColor={accentColor} />
         );
       case 'estatisticas':
         return <CarreiraStatsCards criancaId={perfil.crianca_id} accentColor={accentColor} />;
@@ -187,10 +245,13 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
           </div>
         ) : (
           <div className="space-y-3">
-            {renderNewAtividadeButton('Nova Atividade Extra', () => setAtividadeFormOpen(true))}
+            {renderNewAtividadeButton('Nova Atividade Extra', () => {
+              setEditingActivity(null);
+              setAtividadeFormOpen(true);
+            })}
             {(atividades?.length || 0) > 0 ? (
               atividades?.map((atv) => (
-                <AtividadePublicaCard key={atv.id} atividade={atv} isOwner={isOwner} accentColor={accentColor} onEdit={() => setAtividadeFormOpen(true)} />
+                <AtividadePublicaCard key={atv.id} atividade={atv} isOwner={isOwner} accentColor={accentColor} onEdit={handleEditActivity} />
               ))
             ) : (
               <div className="text-center py-12 text-muted-foreground">
@@ -247,14 +308,17 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
       </div>
       )}
 
-      {/* Tab content (collapsible) */}
+      {/* Tab content */}
       {activeTab && (
-        <div className="rounded-xl border bg-card p-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
+        <div
+          className="rounded-xl bg-card p-4 animate-in fade-in-0 slide-in-from-top-2 duration-200"
+          style={{ border: `2px solid ${accentColor}50` }}
+        >
           {renderTabContent()}
         </div>
       )}
 
-      {/* Posts feed - always visible, priority */}
+      {/* Posts feed */}
       {isOwner && <CreatePostForm perfil={perfil} accentColor={accentColor} />}
 
       {postsLoading ? (
@@ -275,23 +339,46 @@ export function CarreiraTimeline({ perfil, isOwner = false }: CarreiraTimelinePr
         </div>
       ) : null}
 
-      {/* Atividade form dialog for Carreira */}
+      {/* Dialogs */}
       {isOwner && perfil.crianca_id && (
         <>
           <CarreiraAtividadeFormDialog
             open={atividadeFormOpen}
-            onOpenChange={setAtividadeFormOpen}
+            onOpenChange={handleAtividadeFormClose}
             criancaId={perfil.crianca_id}
             childName={perfil.nome}
+            editingActivity={editingActivity}
           />
           <ExperienciaFormDialog
             open={experienciaFormOpen}
-            onOpenChange={setExperienciaFormOpen}
+            onOpenChange={handleExperienciaFormClose}
             criancaId={perfil.crianca_id}
             childName={perfil.nome}
+            editingExperiencia={editingExperiencia}
           />
         </>
       )}
+
+      {/* Delete experiência confirmation */}
+      <AlertDialog open={!!deleteExpId} onOpenChange={(open) => !open && setDeleteExpId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remover experiência?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não pode ser desfeita. O registro será permanentemente removido.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteExperiencia}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteExperiencia.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Remover'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

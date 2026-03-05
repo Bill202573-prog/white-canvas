@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Calendar, Loader2, School } from 'lucide-react';
 import { toast } from 'sonner';
-import { useCreateCarreiraExperiencia, useEscolinhasAutocomplete } from '@/hooks/useCarreiraExperienciasData';
+import { useCreateCarreiraExperiencia, useUpdateCarreiraExperiencia, useEscolinhasAutocomplete, CarreiraExperiencia } from '@/hooks/useCarreiraExperienciasData';
 
 const formSchema = z.object({
   nome_escola: z.string().min(2, 'Informe o nome da escola/clube'),
@@ -44,17 +44,21 @@ interface ExperienciaFormDialogProps {
   onOpenChange: (open: boolean) => void;
   criancaId: string;
   childName: string;
+  editingExperiencia?: CarreiraExperiencia | null;
 }
 
-export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName }: ExperienciaFormDialogProps) {
+export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName, editingExperiencia = null }: ExperienciaFormDialogProps) {
   const createExperiencia = useCreateCarreiraExperiencia();
+  const updateExperiencia = useUpdateCarreiraExperiencia();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEscolinhaId, setSelectedEscolinhaId] = useState<string | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const { data: suggestions } = useEscolinhasAutocomplete(searchTerm);
 
-  // Get user ID with session fallback for social auth users
+  const isEditing = !!editingExperiencia;
+  const isPending = createExperiencia.isPending || updateExperiencia.isPending;
+
   useEffect(() => {
     const getUser = async () => {
       const { data } = await supabase.auth.getSession();
@@ -70,6 +74,24 @@ export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName
       bairro: '', cidade: '', estado: '', observacoes: '',
     },
   });
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (editingExperiencia && open) {
+      form.reset({
+        nome_escola: editingExperiencia.nome_escola,
+        data_inicio: editingExperiencia.data_inicio,
+        data_fim: editingExperiencia.data_fim || '',
+        atual: editingExperiencia.atual,
+        bairro: editingExperiencia.bairro || '',
+        cidade: editingExperiencia.cidade || '',
+        estado: editingExperiencia.estado || '',
+        observacoes: editingExperiencia.observacoes || '',
+      });
+      setSearchTerm(editingExperiencia.nome_escola);
+      setSelectedEscolinhaId(editingExperiencia.escolinha_id);
+    }
+  }, [editingExperiencia, open, form]);
 
   const isAtual = form.watch('atual');
 
@@ -92,7 +114,7 @@ export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName
       return;
     }
     try {
-      await createExperiencia.mutateAsync({
+      const payload = {
         crianca_id: criancaId,
         user_id: userId,
         nome_escola: data.nome_escola,
@@ -104,11 +126,18 @@ export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName
         cidade: data.cidade || null,
         estado: data.estado || null,
         observacoes: data.observacoes || null,
-      });
-      toast.success('Experiência registrada!');
+      };
+
+      if (isEditing && editingExperiencia) {
+        await updateExperiencia.mutateAsync({ id: editingExperiencia.id, ...payload });
+        toast.success('Experiência atualizada!');
+      } else {
+        await createExperiencia.mutateAsync(payload);
+        toast.success('Experiência registrada!');
+      }
       handleClose();
     } catch (err) {
-      toast.error('Erro ao registrar experiência');
+      toast.error(isEditing ? 'Erro ao atualizar experiência' : 'Erro ao registrar experiência');
       console.error(err);
     }
   };
@@ -125,9 +154,9 @@ export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Nova Experiência</DialogTitle>
+          <DialogTitle>{isEditing ? 'Editar Experiência' : 'Nova Experiência'}</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            Onde {childName.split(' ')[0]} treina ou treinou
+            {isEditing ? 'Editando experiência de' : 'Onde'} {childName.split(' ')[0]} {isEditing ? '' : 'treina ou treinou'}
           </p>
         </DialogHeader>
 
@@ -269,9 +298,9 @@ export function ExperienciaFormDialog({ open, onOpenChange, criancaId, childName
             {/* Actions */}
             <div className="flex gap-2 justify-end pt-2">
               <Button type="button" variant="outline" onClick={handleClose}>Cancelar</Button>
-              <Button type="submit" disabled={createExperiencia.isPending}>
-                {createExperiencia.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                Salvar
+              <Button type="submit" disabled={isPending}>
+                {isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                {isEditing ? 'Atualizar' : 'Salvar'}
               </Button>
             </div>
           </form>

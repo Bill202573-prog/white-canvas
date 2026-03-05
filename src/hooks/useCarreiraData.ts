@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -402,55 +403,72 @@ export function useDeletePostAtleta() {
   });
 }
 
+// Helper to get current user id with fallback to session (for users without profiles row)
+async function getAuthUserId(): Promise<string | null> {
+  const { data } = await supabase.auth.getSession();
+  return data.session?.user?.id || null;
+}
+
 // Hook to check if user liked a post
 export function usePostLike(postId: string) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [sessionUserId, setSessionUserId] = useState<string | null>(null);
+
+  // Fallback: get user id from session if AuthContext user is null
+  useEffect(() => {
+    if (!user?.id) {
+      getAuthUserId().then(setSessionUserId);
+    }
+  }, [user?.id]);
+
+  const effectiveUserId = user?.id || sessionUserId;
 
   const { data: isLiked } = useQuery({
-    queryKey: ['post-like', postId, user?.id],
+    queryKey: ['post-like', postId, effectiveUserId],
     queryFn: async () => {
-      if (!user?.id) return false;
+      if (!effectiveUserId) return false;
 
       const { data } = await supabase
         .from('post_likes')
         .select('id')
         .eq('post_id', postId)
-        .eq('user_id', user.id)
+        .eq('user_id', effectiveUserId)
         .maybeSingle();
 
       return !!data;
     },
-    enabled: !!user?.id && !!postId,
+    enabled: !!effectiveUserId && !!postId,
   });
 
   const toggleLike = useMutation({
     mutationFn: async () => {
-      if (!user?.id) throw new Error('Usuário não autenticado');
+      const uid = effectiveUserId || (await getAuthUserId());
+      if (!uid) throw new Error('Usuário não autenticado');
 
       if (isLiked) {
         const { error } = await supabase
           .from('post_likes')
           .delete()
           .eq('post_id', postId)
-          .eq('user_id', user.id);
+          .eq('user_id', uid);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('post_likes')
-          .insert({ post_id: postId, user_id: user.id });
+          .insert({ post_id: postId, user_id: uid });
         if (error) throw error;
       }
     },
     onMutate: async () => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['post-like', postId, user?.id] });
+      await queryClient.cancelQueries({ queryKey: ['post-like', postId, effectiveUserId] });
 
       // Snapshot previous values
-      const previousLiked = queryClient.getQueryData(['post-like', postId, user?.id]);
+      const previousLiked = queryClient.getQueryData(['post-like', postId, effectiveUserId]);
 
       // Optimistically update isLiked
-      queryClient.setQueryData(['post-like', postId, user?.id], !isLiked);
+      queryClient.setQueryData(['post-like', postId, effectiveUserId], !isLiked);
 
       // Optimistically update likes_count in all feed queries
       const feedKeys = ['posts-atleta', 'posts-rede', 'feed-posts-global', 'feed-posts-connections'];
@@ -475,7 +493,7 @@ export function usePostLike(postId: string) {
     onError: (err: any, _vars, context) => {
       // Rollback on error
       if (context) {
-        queryClient.setQueryData(['post-like', postId, user?.id], context.previousLiked);
+        queryClient.setQueryData(['post-like', postId, effectiveUserId], context.previousLiked);
         Object.entries(context.previousFeeds).forEach(([key, data]) => {
           queryClient.setQueryData(JSON.parse(key), data);
         });
